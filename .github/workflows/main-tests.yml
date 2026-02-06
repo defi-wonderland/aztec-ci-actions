@@ -1,0 +1,70 @@
+name: Main Branch Tests
+
+on:
+  workflow_call:
+    inputs:
+      run-js-tests:
+        description: "Whether to run JS tests"
+        type: boolean
+        default: true
+      run-noir-tests:
+        description: "Whether to run Noir tests"
+        type: boolean
+        default: true
+      noir-test-threads:
+        description: "Number of Noir test threads"
+        type: string
+        default: "12"
+      runner:
+        description: "GitHub runner label"
+        type: string
+        default: "ubuntu-latest-m"
+
+jobs:
+  # ══════════════════════════════════════════════════════════════════════════════
+  # JS TESTS
+  # ══════════════════════════════════════════════════════════════════════════════
+  js-tests:
+    name: JS Tests
+    if: ${{ inputs.run-js-tests }}
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Aztec environment
+        uses: defi-wonderland/aztec-ci-actions/actions/setup-aztec@feat/v4-workflows # TODO: change to dev / main
+        with:
+          start-pxe: "true"
+          run-codegen: "true"
+
+      - name: Run JS tests
+        uses: defi-wonderland/aztec-ci-actions/actions/js-tests@feat/v4-workflows # TODO: change to dev / main
+
+  # ══════════════════════════════════════════════════════════════════════════════
+  # NOIR TESTS
+  # ══════════════════════════════════════════════════════════════════════════════
+  noir-tests:
+    name: Noir Tests
+    if: ${{ inputs.run-noir-tests }}
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Aztec environment
+        uses: defi-wonderland/aztec-ci-actions/actions/setup-aztec@feat/v4-workflows # TODO: change to dev / main
+        with:
+          start-pxe: "false"
+          run-codegen: "false"
+
+      - name: Run Noir tests
+        uses: defi-wonderland/aztec-ci-actions/actions/noir-tests@feat/v4-workflows # TODO: change to dev / main
+        with:
+          threads: ${{ inputs.noir-test-threads }}

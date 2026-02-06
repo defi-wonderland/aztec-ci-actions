@@ -1,0 +1,114 @@
+name: PR Checks
+
+on:
+  workflow_call:
+    inputs:
+      run-benchmark:
+        description: "Whether to run benchmarks"
+        type: boolean
+        default: true
+      run-js-tests:
+        description: "Whether to run JS tests"
+        type: boolean
+        default: true
+      run-noir-tests:
+        description: "Whether to run Noir tests"
+        type: boolean
+        default: true
+      noir-test-threads:
+        description: "Number of Noir test threads"
+        type: string
+        default: "12"
+      runner:
+        description: "GitHub runner label"
+        type: string
+        default: "ubuntu-latest-m"
+      timeout:
+        description: "Job timeout in minutes"
+        type: number
+        default: 120
+
+permissions:
+  pull-requests: write
+  issues: write
+
+env:
+  BENCH_DIR: ./benchmarks
+
+jobs:
+  # ══════════════════════════════════════════════════════════════════════════════
+  # BENCHMARK JOB
+  # ══════════════════════════════════════════════════════════════════════════════
+  benchmark:
+    name: Benchmark
+    if: ${{ inputs.run-benchmark }}
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: ${{ inputs.timeout }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Setup Aztec environment
+        uses: defi-wonderland/aztec-ci-actions/actions/setup-aztec@feat/v4-workflows # TODO: change to dev / main
+        with:
+          start-pxe: "true"
+          run-codegen: "true"
+
+      - name: Run benchmarks
+        uses: defi-wonderland/aztec-ci-actions/actions/benchmark@feat/v4-workflows # TODO: change to dev / main
+        with:
+          pr-number: ${{ github.event.pull_request.number }}
+          base-ref: ${{ github.event.pull_request.base.ref }}
+          head-ref: ${{ github.event.pull_request.head.ref }}
+          bench-dir: ${{ env.BENCH_DIR }}
+
+  # ══════════════════════════════════════════════════════════════════════════════
+  # JS TESTS JOB
+  # ══════════════════════════════════════════════════════════════════════════════
+  js-tests:
+    name: JS Tests
+    if: ${{ inputs.run-js-tests }}
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Aztec environment
+        uses: defi-wonderland/aztec-ci-actions/actions/setup-aztec@feat/v4-workflows # TODO: change to dev / main
+        with:
+          start-pxe: "true"
+          run-codegen: "true"
+
+      - name: Run JS tests
+        uses: defi-wonderland/aztec-ci-actions/actions/js-tests@feat/v4-workflows # TODO: change to dev / main
+
+  # ══════════════════════════════════════════════════════════════════════════════
+  # NOIR TESTS JOB
+  # ══════════════════════════════════════════════════════════════════════════════
+  noir-tests:
+    name: Noir Tests
+    if: ${{ inputs.run-noir-tests }}
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Aztec environment
+        uses: defi-wonderland/aztec-ci-actions/actions/setup-aztec@feat/v4-workflows # TODO: change to dev / main
+        with:
+          start-pxe: "false"
+          run-codegen: "false"
+
+      - name: Run Noir tests
+        uses: defi-wonderland/aztec-ci-actions/actions/noir-tests@feat/v4-workflows # TODO: change to dev / main
+        with:
+          threads: ${{ inputs.noir-test-threads }}
