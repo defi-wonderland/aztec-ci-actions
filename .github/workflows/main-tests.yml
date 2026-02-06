@@ -36,13 +36,13 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Aztec environment
-        uses: defi-wonderland/aztec-ci-actions/actions/setup-aztec@feat/v4-workflows # TODO: change to dev / main
+        uses: defi-wonderland/aztec-ci-actions/actions/setup-aztec@dev
         with:
           start-pxe: "true"
           run-codegen: "true"
 
       - name: Run JS tests
-        uses: defi-wonderland/aztec-ci-actions/actions/js-tests@feat/v4-workflows # TODO: change to dev / main
+        uses: defi-wonderland/aztec-ci-actions/actions/js-tests@dev
 
   # ══════════════════════════════════════════════════════════════════════════════
   # NOIR TESTS
@@ -59,12 +59,12 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Aztec environment
-        uses: defi-wonderland/aztec-ci-actions/actions/setup-aztec@feat/v4-workflows # TODO: change to dev / main
+        uses: defi-wonderland/aztec-ci-actions/actions/setup-aztec@dev
         with:
           start-pxe: "false"
           run-codegen: "false"
 
       - name: Run Noir tests
-        uses: defi-wonderland/aztec-ci-actions/actions/noir-tests@feat/v4-workflows # TODO: change to dev / main
+        uses: defi-wonderland/aztec-ci-actions/actions/noir-tests@dev
         with:
           threads: ${{ inputs.noir-test-threads }}
