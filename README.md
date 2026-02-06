@@ -1,6 +1,6 @@
 # aztec-ci-actions
 
-Reusable GitHub Actions and workflows for Wonderland's Aztec submodule repos. Eliminates ~420 lines of duplicated CI YAML.
+Reusable GitHub Actions and workflows for Wonderland's Aztec submodule repos.
 
 ## Structure
 
@@ -14,13 +14,12 @@ actions/
 .github/workflows/
 ├── pr-checks.yml                # Reusable: benchmark + js-tests + noir-tests
 ├── main-tests.yml               # Reusable: js-tests + noir-tests
-├── update-baseline.yml          # Reusable: benchmark baseline management
-└── notify-superproject.yml      # Reusable: repository_dispatch to superproject
+└── update-baseline.yml          # Reusable: benchmark baseline management
 ```
 
 ## Usage in submodule repos
 
-### PR checks (replaces 91-line workflow)
+### PR checks
 
 ```yaml
 # .github/workflows/pr-checks.yml
@@ -35,7 +34,7 @@ jobs:
     secrets: inherit
 ```
 
-### Main branch tests (replaces 58-line workflow)
+### Main branch tests
 
 ```yaml
 # .github/workflows/main-tests.yml
@@ -49,7 +48,7 @@ jobs:
     secrets: inherit
 ```
 
-### Benchmark baseline (replaces 67-line workflow)
+### Benchmark baseline
 
 ```yaml
 # .github/workflows/update-baseline.yml
@@ -58,27 +57,12 @@ on:
   push:
     branches: [dev, main]
   schedule:
-    - cron: '0 0 1 * *'
+    - cron: "0 0 1 * *"
   workflow_dispatch:
 jobs:
   baseline:
     uses: defi-wonderland/aztec-ci-actions/.github/workflows/update-baseline.yml@main
     secrets: inherit
-```
-
-### Superproject notification (replaces template copy)
-
-```yaml
-# .github/workflows/notify-superproject.yml
-name: Notify Superproject
-on:
-  push:
-    branches: [chore/v4]
-jobs:
-  notify:
-    uses: defi-wonderland/aztec-ci-actions/.github/workflows/notify-superproject.yml@main
-    secrets:
-      superproject-pat: ${{ secrets.SUPERPROJECT_PAT }}
 ```
 
 ### Setup action only (for custom workflows)
@@ -88,8 +72,8 @@ steps:
   - uses: actions/checkout@v4
   - uses: defi-wonderland/aztec-ci-actions/actions/setup-aztec@main
     with:
-      start-pxe: 'false'
-      run-codegen: 'false'
+      start-pxe: "false"
+      run-codegen: "false"
 ```
 
 ## What each action does
