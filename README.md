@@ -31,7 +31,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   checks:
-    uses: defi-wonderland/aztec-ci-actions/.github/workflows/pr-checks.yml@main
+    uses: defi-wonderland/aztec-ci-actions/.github/workflows/pr-checks.yml@<tag>
     secrets: inherit
 ```
 
@@ -45,7 +45,7 @@ on:
     branches: [main]
 jobs:
   tests:
-    uses: defi-wonderland/aztec-ci-actions/.github/workflows/main-tests.yml@main
+    uses: defi-wonderland/aztec-ci-actions/.github/workflows/main-tests.yml@<tag>
     secrets: inherit
 ```
 
@@ -62,7 +62,7 @@ on:
   workflow_dispatch:
 jobs:
   baseline:
-    uses: defi-wonderland/aztec-ci-actions/.github/workflows/update-baseline.yml@main
+    uses: defi-wonderland/aztec-ci-actions/.github/workflows/update-baseline.yml@<tag>
     secrets: inherit
 ```
 
@@ -75,7 +75,7 @@ on:
   workflow_dispatch:
 jobs:
   pre-release:
-    uses: defi-wonderland/aztec-ci-actions/.github/workflows/pre-release.yml@main
+    uses: defi-wonderland/aztec-ci-actions/.github/workflows/pre-release.yml@<tag>
     secrets: inherit
     permissions:
       contents: write
@@ -98,7 +98,7 @@ Or in `package.json`:
 ```yaml
 steps:
   - uses: actions/checkout@v4
-  - uses: defi-wonderland/aztec-ci-actions/actions/setup-aztec@main
+  - uses: defi-wonderland/aztec-ci-actions/actions/setup-aztec@<tag>
     with:
       start-pxe: "false"
       run-codegen: "false"
@@ -159,4 +159,4 @@ Production `npm install` from the npm registry is completely unaffected — pre-
 
 ## Versioning
 
-Pin to `@main` during development. Tag releases as `v1`, `v1.1`, etc. once stable. Submodules pin to `@v1` (major) for stability.
+Pin to `@dev` during development. Tag releases as `v1`, `v1.1`, etc. once stable. Submodules pin to `@v1` (major) for stability.
