@@ -3,6 +3,10 @@ name: Pre-Release
 on:
   workflow_call:
     inputs:
+      package-dir:
+        description: "Path to the publishable package (relative to repo root)"
+        type: string
+        default: "."
       runner:
         description: "GitHub runner label"
         type: string
@@ -27,7 +31,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Aztec environment
-        uses: defi-wonderland/aztec-ci-actions/actions/setup-aztec@feat/gh-prerelease # TODO: Switch to tag
+        uses: defi-wonderland/aztec-ci-actions/actions/setup-aztec@dev
         with:
           start-pxe: "false"
           run-codegen: "true"
@@ -37,6 +41,7 @@ jobs:
 
       - name: Generate pre-release version
         id: version
+        working-directory: ${{ inputs.package-dir }}
         run: |
           BASE_VERSION=$(node -p "require('./package.json').version")
           PKG_NAME=$(node -p "require('./package.json').name")
@@ -54,10 +59,12 @@ jobs:
           echo "Tag: ${TAG}"
 
       - name: Set pre-release version
+        working-directory: ${{ inputs.package-dir }}
         run: npm pkg set "version=${{ steps.version.outputs.version }}"
 
       - name: Create npm tarball
         id: pack
+        working-directory: ${{ inputs.package-dir }}
         run: |
           npm pack
           TARBALL=$(ls *.tgz)
@@ -65,6 +72,7 @@ jobs:
           echo "Packed: ${TARBALL}"
 
       - name: Create dist tarball
+        working-directory: ${{ inputs.package-dir }}
         run: tar -czf dist.tar.gz dist/
 
       - name: Create GitHub Pre-Release
@@ -96,5 +104,5 @@ jobs:
             | `${{ steps.pack.outputs.tarball }}` | npm-installable tarball (`npm install <url>`) |
             | `dist.tar.gz` | Built `dist/` directory for manual extraction |
           files: |
-            ${{ steps.pack.outputs.tarball }}
-            dist.tar.gz
+            ${{ inputs.package-dir }}/${{ steps.pack.outputs.tarball }}
+            ${{ inputs.package-dir }}/dist.tar.gz
