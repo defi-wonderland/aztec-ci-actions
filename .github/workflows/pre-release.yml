@@ -59,7 +59,8 @@ jobs:
       - name: Create npm tarball
         id: pack
         run: |
-          TARBALL=$(npm pack)
+          npm pack
+          TARBALL=$(ls *.tgz)
           echo "tarball=${TARBALL}" >> $GITHUB_OUTPUT
           echo "Packed: ${TARBALL}"
 
