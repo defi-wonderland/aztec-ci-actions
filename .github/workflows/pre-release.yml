@@ -1,0 +1,124 @@
+name: Pre-Release
+
+on:
+  workflow_call:
+    inputs:
+      package-dir:
+        description: "Path to the publishable package (relative to repo root)"
+        type: string
+        default: "."
+      runner:
+        description: "GitHub runner label"
+        type: string
+        default: "ubuntu-latest-m"
+      timeout:
+        description: "Job timeout in minutes"
+        type: number
+        default: 30
+
+permissions:
+  contents: write
+
+jobs:
+  pre-release:
+    name: Pre-Release
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: ${{ inputs.timeout }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Aztec environment
+        uses: defi-wonderland/aztec-ci-actions/actions/setup-aztec@feat/gh-prerelease # TODO: Switch to tag
+        with:
+          start-pxe: "false"
+          run-codegen: "true"
+
+      - name: Build package
+        run: yarn build
+
+      - name: Generate pre-release version
+        id: version
+        working-directory: ${{ inputs.package-dir }}
+        run: |
+          BASE_VERSION=$(node -p "require('./package.json').version")
+          PKG_NAME=$(node -p "require('./package.json').name")
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          PRERELEASE_VERSION="${BASE_VERSION}-prerelease.${SHORT_SHA}"
+          TAG="prerelease-${SHORT_SHA}"
+
+          echo "version=${PRERELEASE_VERSION}" >> $GITHUB_OUTPUT
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "short-sha=${SHORT_SHA}" >> $GITHUB_OUTPUT
+          echo "pkg-name=${PKG_NAME}" >> $GITHUB_OUTPUT
+
+          echo "Package: ${PKG_NAME}"
+          echo "Pre-release version: ${PRERELEASE_VERSION}"
+          echo "Tag: ${TAG}"
+
+      - name: Set pre-release version
+        working-directory: ${{ inputs.package-dir }}
+        run: npm pkg set "version=${{ steps.version.outputs.version }}"
+
+      - name: Create npm tarball
+        id: pack
+        working-directory: ${{ inputs.package-dir }}
+        run: |
+          npm pack
+          TARBALL=$(ls *.tgz)
+          echo "tarball=${TARBALL}" >> $GITHUB_OUTPUT
+          echo "Packed: ${TARBALL}"
+
+      - name: Create dist tarball
+        working-directory: ${{ inputs.package-dir }}
+        run: tar -czf dist.tar.gz dist/
+
+      - name: Create GitHub Pre-Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: "${{ steps.version.outputs.pkg-name }}@${{ steps.version.outputs.version }}"
+          prerelease: true
+          generate_release_notes: false
+          body: |
+            Pre-release build from `${{ github.ref_name }}` at [`${{ steps.version.outputs.short-sha }}`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}).
+
+            ## Install via tarball URL
+
+            ```bash
+            npm install ${{ github.server_url }}/${{ github.repository }}/releases/download/${{ steps.version.outputs.tag }}/${{ steps.pack.outputs.tarball }}
+            ```
+
+            Or in `package.json`:
+
+            ```json
+            "${{ steps.version.outputs.pkg-name }}": "${{ github.server_url }}/${{ github.repository }}/releases/download/${{ steps.version.outputs.tag }}/${{ steps.pack.outputs.tarball }}"
+            ```
+
+            ## Assets
+
+            | File | Description |
+            |------|-------------|
+            | `${{ steps.pack.outputs.tarball }}` | npm-installable tarball (`npm install <url>`) |
+            | `dist.tar.gz` | Built `dist/` directory for manual extraction |
+          files: |
+            ${{ inputs.package-dir }}/${{ steps.pack.outputs.tarball }}
+            ${{ inputs.package-dir }}/dist.tar.gz
+
+      - name: Installation instructions
+        run: |
+          echo ""
+          echo "══════════════════════════════════════════════════════════════"
+          echo "  Pre-release published successfully!"
+          echo "══════════════════════════════════════════════════════════════"
+          echo ""
+          echo "  Add to package.json:"
+          echo ""
+          echo "    \"${{ steps.version.outputs.pkg-name }}\": \"${{ github.server_url }}/${{ github.repository }}/releases/download/${{ steps.version.outputs.tag }}/${{ steps.pack.outputs.tarball }}\""
+          echo ""
+          echo "  Then run: yarn install"
+          echo ""
+          echo "══════════════════════════════════════════════════════════════"
+          echo ""

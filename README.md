@@ -14,7 +14,8 @@ actions/
 .github/workflows/
 ├── pr-checks.yml                # Reusable: benchmark + js-tests + noir-tests
 ├── main-tests.yml               # Reusable: js-tests + noir-tests
-└── update-baseline.yml          # Reusable: benchmark baseline management
+├── update-baseline.yml          # Reusable: benchmark baseline management
+└── pre-release.yml              # Reusable: build + tag + GitHub pre-release
 ```
 
 ## Usage in submodule repos
@@ -65,6 +66,33 @@ jobs:
     secrets: inherit
 ```
 
+### Pre-release
+
+```yaml
+# .github/workflows/pre-release.yml
+name: Pre-Release
+on:
+  workflow_dispatch:
+jobs:
+  pre-release:
+    uses: defi-wonderland/aztec-ci-actions/.github/workflows/pre-release.yml@main
+    secrets: inherit
+    permissions:
+      contents: write
+```
+
+Dependents install the pre-release tarball from the GitHub Release:
+
+```bash
+npm install https://github.com/<owner>/<repo>/releases/download/prerelease-<sha>/<tarball-name>.tgz
+```
+
+Or in `package.json`:
+
+```json
+"<package>": "https://github.com/<owner>/<repo>/releases/download/prerelease-<sha>/<tarball-name>.tgz"
+```
+
 ### Setup action only (for custom workflows)
 
 ```yaml
@@ -105,6 +133,29 @@ Benchmark comparison on PRs:
 ### `js-tests` / `noir-tests`
 
 Thin wrappers around `yarn test:js` and `aztec test` with proper env vars and terminal allocation.
+
+## Pre-release workflow
+
+The `pre-release.yml` reusable workflow builds the package and publishes a GitHub pre-release with installable artifacts. This allows dependent repos to test unreleased changes without publishing to npm.
+
+**What it does:**
+
+1. Full Aztec environment setup (compile + codegen)
+2. `yarn build`
+3. Generate a pre-release version: `<base-version>-prerelease.<short-sha>`
+4. Set the version temporarily (never committed to git)
+5. `npm pack` to create an npm-installable `.tgz` tarball
+6. `tar -czf dist.tar.gz dist/` for the built output
+7. Create a git tag `prerelease-<short-sha>` and a GitHub Release marked as pre-release
+
+**Artifacts attached to each release:**
+
+| Asset | Purpose |
+|-------|---------|
+| `<name>-<version>.tgz` | npm-installable tarball — use with `npm install <url>` |
+| `dist.tar.gz` | Raw `dist/` directory for manual extraction |
+
+Production `npm install` from the npm registry is completely unaffected — pre-releases only exist as GitHub Release assets.
 
 ## Versioning
 
