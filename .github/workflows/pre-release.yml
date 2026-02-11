@@ -15,6 +15,10 @@ on:
         description: "Job timeout in minutes"
         type: number
         default: 30
+      run-compile:
+        description: "Whether to run aztec compile"
+        type: boolean
+        default: true
       run-codegen:
         description: "Whether to run aztec codegen"
         type: boolean
@@ -38,6 +42,7 @@ jobs:
         uses: defi-wonderland/aztec-ci-actions/actions/setup-aztec@v0
         with:
           start-pxe: "false"
+          run-compile: ${{ inputs.run-compile }}
           run-codegen: ${{ inputs.run-codegen }}
 
       - name: Build package

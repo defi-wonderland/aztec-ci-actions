@@ -79,6 +79,10 @@ jobs:
     secrets: inherit
     permissions:
       contents: write
+    # Optional: for pure-JS repos (no Noir contracts), skip compile and codegen:
+    # with:
+    #   run-compile: false
+    #   run-codegen: false
 ```
 
 Dependents install the pre-release tarball from the GitHub Release:
@@ -101,6 +105,7 @@ steps:
   - uses: defi-wonderland/aztec-ci-actions/actions/setup-aztec@<tag>
     with:
       start-pxe: "false"
+      run-compile: "true"
       run-codegen: "false"
 ```
 
@@ -117,9 +122,11 @@ Full Aztec development environment setup:
 5. Install Aztec CLI at detected version
 6. (optional) Start local network
 7. `yarn --frozen-lockfile`
-8. `aztec compile`
-9. (optional) `aztec codegen`
+8. (optional) `aztec compile` — controlled by `run-compile` (default: true)
+9. (optional) `aztec codegen` — controlled by `run-codegen` (default: false); requires compile (fails if `run-codegen: true` but `run-compile: false`)
 10. (optional) Start PXE node
+
+For **pure-JS repos** (no Noir contracts): set `run-compile: "false"` and `run-codegen: "false"` to skip contract build steps.
 
 ### `benchmark`
 
@@ -140,7 +147,7 @@ The `pre-release.yml` reusable workflow builds the package and publishes a GitHu
 
 **What it does:**
 
-1. Full Aztec environment setup (compile + optional codegen, configurable via `run-codegen` input, default true)
+1. Full Aztec environment setup — `run-compile` (default: true) and `run-codegen` (default: true) control whether to compile Noir contracts and run codegen; set both to `false` for pure-JS repos
 2. `yarn build`
 3. Generate a pre-release version: `<base-version>-prerelease.<short-sha>`
 4. Set the version temporarily (never committed to git)

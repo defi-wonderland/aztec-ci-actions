@@ -6,8 +6,12 @@ inputs:
     description: 'Whether to start PXE node'
     required: false
     default: 'false'
+  run-compile:
+    description: 'Whether to run aztec compile'
+    required: false
+    default: 'true'
   run-codegen:
-    description: 'Whether to run aztec codegen'
+    description: 'Whether to run aztec codegen (action fails if true while run-compile is false)'
     required: false
     default: 'false'
 
@@ -19,6 +23,14 @@ outputs:
 runs:
   using: 'composite'
   steps:
+    - name: Validate inputs
+      shell: bash
+      run: |
+        if [ "${{ inputs.run-codegen }}" = "true" ] && [ "${{ inputs.run-compile }}" = "false" ]; then
+          echo "::error::run-codegen requires run-compile (codegen needs compile artifacts); set run-compile to true"
+          exit 1
+        fi
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
@@ -64,6 +76,7 @@ runs:
       run: yarn --frozen-lockfile
 
     - name: Compile contracts
+      if: inputs.run-compile == 'true'
       shell: bash
       run: aztec compile
 
