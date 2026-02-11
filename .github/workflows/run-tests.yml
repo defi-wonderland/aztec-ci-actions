@@ -52,13 +52,13 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Aztec environment
-        uses: defi-wonderland/aztec-ci-actions/actions/setup-aztec@v0
+        uses: defi-wonderland/aztec-ci-actions/actions/setup-aztec@v0.0.2
         with:
           start-pxe: "true"
           run-codegen: "true"
 
       - name: Run benchmarks
-        uses: defi-wonderland/aztec-ci-actions/actions/benchmark@v0
+        uses: defi-wonderland/aztec-ci-actions/actions/benchmark@v0.0.2
         with:
           pr-number: ${{ github.event.pull_request.number }}
           base-ref: ${{ github.event.pull_request.base.ref }}
@@ -80,13 +80,13 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Aztec environment
-        uses: defi-wonderland/aztec-ci-actions/actions/setup-aztec@v0
+        uses: defi-wonderland/aztec-ci-actions/actions/setup-aztec@v0.0.2
         with:
           start-pxe: "true"
           run-codegen: "true"
 
       - name: Run JS tests
-        uses: defi-wonderland/aztec-ci-actions/actions/js-tests@v0
+        uses: defi-wonderland/aztec-ci-actions/actions/js-tests@v0.0.2
 
   # ══════════════════════════════════════════════════════════════════════════════
   # NOIR TESTS JOB
@@ -103,12 +103,12 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Aztec environment
-        uses: defi-wonderland/aztec-ci-actions/actions/setup-aztec@v0
+        uses: defi-wonderland/aztec-ci-actions/actions/setup-aztec@v0.0.2
         with:
           start-pxe: "false"
           run-codegen: "false"
 
       - name: Run Noir tests
-        uses: defi-wonderland/aztec-ci-actions/actions/noir-tests@v0
+        uses: defi-wonderland/aztec-ci-actions/actions/noir-tests@v0.0.2
         with:
           threads: ${{ inputs.noir-test-threads }}
