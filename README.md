@@ -79,10 +79,6 @@ jobs:
     secrets: inherit
     permissions:
       contents: write
-    # Optional: for pure-JS repos (no Noir contracts), skip compile and codegen:
-    # with:
-    #   run-compile: false
-    #   run-codegen: false
 ```
 
 Dependents install the pre-release tarball from the GitHub Release:

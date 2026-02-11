@@ -11,7 +11,7 @@ inputs:
     required: false
     default: 'true'
   run-codegen:
-    description: 'Whether to run aztec codegen (action fails if true while run-compile is false)'
+    description: 'Whether to run aztec codegen (requires run-compile)'
     required: false
     default: 'false'
 
