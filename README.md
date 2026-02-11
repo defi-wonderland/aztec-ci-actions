@@ -140,7 +140,7 @@ The `pre-release.yml` reusable workflow builds the package and publishes a GitHu
 
 **What it does:**
 
-1. Full Aztec environment setup (compile + codegen)
+1. Full Aztec environment setup (compile + optional codegen, configurable via `run-codegen` input, default true)
 2. `yarn build`
 3. Generate a pre-release version: `<base-version>-prerelease.<short-sha>`
 4. Set the version temporarily (never committed to git)
