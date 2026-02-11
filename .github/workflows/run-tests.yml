@@ -1,4 +1,4 @@
-name: PR Checks
+name: Run Tests
 
 on:
   workflow_call:
