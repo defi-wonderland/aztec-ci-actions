@@ -111,11 +111,11 @@ steps:
 
 Full Aztec development environment setup:
 
-1. Node.js 22.17.0
+1. Node.js 22.17.0 (with yarn cache)
 2. Add `~/.aztec` to PATH
 3. Detect version from `config.aztecVersion` in `package.json`
 4. Install Foundry
-5. Install Aztec CLI at detected version
+5. Aztec CLI — restored from cache when available (key: `aztec-<runner.os>-<version>`), otherwise installed
 6. (optional) Start local network
 7. `yarn --frozen-lockfile`
 8. (optional) `aztec compile` — controlled by `run-compile` (default: true)
