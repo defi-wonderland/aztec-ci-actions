@@ -19,6 +19,12 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - name: Run PR benchmarks
+      uses: defi-wonderland/aztec-benchmark/action@chore/v4
+      with:
+        current_suffix: '_new'
+        reports_dir: ${{ inputs.bench-dir }}
+
     - name: Encode base branch name
       id: encode-base
       shell: bash
@@ -50,8 +56,10 @@ runs:
     - name: Generate Markdown diff
       uses: defi-wonderland/aztec-benchmark/action@chore/v4
       with:
+        only_report: 'true'
         base_suffix: '_latest'
         current_suffix: '_new'
+        reports_dir: ${{ inputs.bench-dir }}
 
     - name: Comment diff on PR
       uses: peter-evans/create-or-update-comment@v4

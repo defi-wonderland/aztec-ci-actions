@@ -128,10 +128,11 @@ For **pure-JS repos** (no Noir contracts): set `run-compile: "false"` and `run-c
 
 Benchmark comparison on PRs:
 
-1. Download baseline artifact from base branch
-2. Generate markdown diff via `aztec-benchmark/action`
-3. Comment diff on PR
-4. Upload new baseline as artifact
+1. Run PR benchmarks (gives the BASE `update-baseline` job time to finish)
+2. Download baseline artifact from base branch
+3. Generate markdown diff via `aztec-benchmark/action` with `only_report` (comparison only, no re-run)
+4. Comment diff on PR
+5. Upload new baseline as artifact
 
 ### `js-tests` / `noir-tests`
 
