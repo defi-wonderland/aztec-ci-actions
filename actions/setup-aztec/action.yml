@@ -85,10 +85,21 @@ runs:
       shell: bash
       run: aztec codegen target --outdir src/artifacts -f
 
-    - name: Start PXE node
+    - name: Wait for local network (port 8080)
       if: inputs.start-pxe == 'true'
       shell: bash
       run: |
-        VERSION=${{ steps.aztec-version.outputs.version }} aztec \
-          start --port 8081 --pxe --pxe.nodeUrl=http://localhost:8080/ \
-          --pxe.proverEnabled false &
+        echo "Waiting for local network on port 8080..."
+        timeout=120
+        elapsed=0
+        while ! nc -z localhost 8080 2>/dev/null; do
+          if [ $elapsed -ge $timeout ]; then
+            echo "::error::Timed out waiting for port 8080 after ${timeout}s"
+            exit 1
+          fi
+          sleep 2
+          elapsed=$((elapsed + 2))
+          echo "  waiting... (${elapsed}s)"
+        done
+        echo "Port 8080 is ready (took ${elapsed}s)"
+
