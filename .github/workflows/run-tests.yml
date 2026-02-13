@@ -60,7 +60,7 @@ jobs:
           run-codegen: "true"
 
       - name: Run benchmarks
-        uses: defi-wonderland/aztec-ci-actions/actions/benchmark@v0
+        uses: defi-wonderland/aztec-ci-actions/actions/benchmark@fix/detach-benchmark # TODO: pin to v0 before merging
         with:
           pr-number: ${{ github.event.pull_request.number }}
           base-ref: ${{ github.event.pull_request.base.ref }}
