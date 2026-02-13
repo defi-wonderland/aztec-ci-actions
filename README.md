@@ -7,20 +7,17 @@ Reusable GitHub Actions and workflows for Wonderland's Aztec submodule repos.
 ```
 actions/
 ├── setup-aztec/action.yml       # Node, Foundry, Aztec CLI, compile, codegen, PXE
-├── benchmark/action.yml         # Download baseline, diff, comment, upload
 ├── js-tests/action.yml          # yarn test:js wrapper
 └── noir-tests/action.yml        # aztec test wrapper
 
 .github/workflows/
-├── pr-checks.yml                # Reusable: benchmark + js-tests + noir-tests
-├── main-tests.yml               # Reusable: js-tests + noir-tests
-├── update-baseline.yml          # Reusable: benchmark baseline management
+├── run-tests.yml                # Reusable: js-tests + noir-tests
 └── pre-release.yml              # Reusable: build + tag + GitHub pre-release
 ```
 
 ## Usage in submodule repos
 
-### PR checks
+### Run tests (JS + Noir)
 
 ```yaml
 # .github/workflows/pr-checks.yml
@@ -30,39 +27,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 jobs:
-  checks:
-    uses: defi-wonderland/aztec-ci-actions/.github/workflows/pr-checks.yml@<tag>
-    secrets: inherit
-```
-
-### Main branch tests
-
-```yaml
-# .github/workflows/main-tests.yml
-name: Main Tests
-on:
-  push:
-    branches: [main]
-jobs:
   tests:
-    uses: defi-wonderland/aztec-ci-actions/.github/workflows/main-tests.yml@<tag>
-    secrets: inherit
-```
-
-### Benchmark baseline
-
-```yaml
-# .github/workflows/update-baseline.yml
-name: Update Benchmark Baseline
-on:
-  push:
-    branches: [dev, main]
-  schedule:
-    - cron: "0 0 1 * *"
-  workflow_dispatch:
-jobs:
-  baseline:
-    uses: defi-wonderland/aztec-ci-actions/.github/workflows/update-baseline.yml@<tag>
+    uses: defi-wonderland/aztec-ci-actions/.github/workflows/run-tests.yml@<tag>
     secrets: inherit
 ```
 
@@ -123,15 +89,6 @@ Full Aztec development environment setup:
 10. (optional) Start PXE node
 
 For **pure-JS repos** (no Noir contracts): set `run-compile: "false"` and `run-codegen: "false"` to skip contract build steps.
-
-### `benchmark`
-
-Benchmark comparison on PRs:
-
-1. Download baseline artifact from base branch
-2. Generate markdown diff via `aztec-benchmark/action`
-3. Comment diff on PR
-4. Upload new baseline as artifact
 
 ### `js-tests` / `noir-tests`
 
