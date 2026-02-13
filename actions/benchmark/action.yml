@@ -20,7 +20,7 @@ runs:
   using: 'composite'
   steps:
     - name: Run PR benchmarks
-      uses: defi-wonderland/aztec-benchmark/action@v0
+      uses: defi-wonderland/aztec-benchmark@v0
       with:
         current_suffix: '_new'
         reports_dir: ${{ inputs.bench-dir }}
@@ -54,7 +54,7 @@ runs:
         if_no_artifact_found: warn
 
     - name: Generate Markdown diff
-      uses: defi-wonderland/aztec-benchmark/action@v0
+      uses: defi-wonderland/aztec-benchmark@v0
       with:
         only_report: 'true'
         base_suffix: '_latest'
