@@ -29,8 +29,10 @@ on:
         default: 120
 
 permissions:
+  contents: read
   pull-requests: write
   issues: write
+  actions: write
 
 env:
   BENCH_DIR: ./benchmarks
