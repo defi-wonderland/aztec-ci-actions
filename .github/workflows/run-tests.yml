@@ -11,10 +11,6 @@ on:
         description: "Whether to run Noir tests"
         type: boolean
         default: true
-      noir-test-threads:
-        description: "Number of Noir test threads"
-        type: string
-        default: "12"
       runner:
         description: "GitHub runner label"
         type: string
@@ -70,5 +66,3 @@ jobs:
 
       - name: Run Noir tests
         uses: defi-wonderland/aztec-ci-actions/actions/noir-tests@v0
-        with:
-          threads: ${{ inputs.noir-test-threads }}
