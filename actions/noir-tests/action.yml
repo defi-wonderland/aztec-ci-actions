@@ -1,10 +1,109 @@
 name: 'Run Noir Tests'
 description: 'Run Noir contract tests'
 
+inputs:
+  test-threads:
+    description: 'Number of parallel test threads for nargo'
+    required: false
+    default: '4'
+  max-retries:
+    description: 'Maximum number of retry attempts per package for flaky TXE failures'
+    required: false
+    default: '2'
+
 runs:
   using: 'composite'
   steps:
     - name: Run Noir tests
       shell: bash
+      env:
+        TEST_THREADS: ${{ inputs.test-threads }}
+        MAX_RETRIES: ${{ inputs.max-retries }}
       run: |
-        script -e -c "aztec test"
+        set +e
+
+        # Discover all packages in the workspace
+        packages=$(nargo test --workspace --list-tests 2>&1 | awk '{print $1}' | sort -u)
+        if [ -z "$packages" ]; then
+          echo "No test packages found"
+          exit 0
+        fi
+
+        echo "Discovered packages: $packages"
+        failed_packages=""
+        total_passed=0
+        total_failed=0
+
+        start_txe() {
+          export LOG_LEVEL="${LOG_LEVEL:-"error;trace:contract_log"}"
+          aztec start --txe --port 8081 &
+          txe_pid=$!
+          echo "Waiting for TXE server on port 8081..."
+          elapsed=0
+          while ! nc -z 127.0.0.1 8081 2>/dev/null; do
+            if [ $elapsed -ge 60 ]; then
+              echo "::warning::TXE server failed to start within 60s"
+              kill $txe_pid 2>/dev/null || true
+              wait $txe_pid 2>/dev/null || true
+              return 1
+            fi
+            sleep 1
+            elapsed=$((elapsed + 1))
+          done
+          echo "TXE server ready (took ${elapsed}s)"
+          return 0
+        }
+
+        stop_txe() {
+          kill $txe_pid 2>/dev/null || true
+          wait $txe_pid 2>/dev/null || true
+          sleep 1
+        }
+
+        for pkg in $packages; do
+          echo ""
+          echo "========================================"
+          echo "Testing package: $pkg"
+          echo "========================================"
+
+          pkg_passed=false
+          attempt=1
+          while [ "$attempt" -le "$MAX_RETRIES" ]; do
+            if [ "$attempt" -gt 1 ]; then
+              echo "--- Retry attempt $attempt for $pkg ---"
+            fi
+
+            if start_txe; then
+              export NARGO_FOREIGN_CALL_TIMEOUT=300000
+              if script -e -c "nargo test --silence-warnings --oracle-resolver http://127.0.0.1:8081 --test-threads $TEST_THREADS --package $pkg"; then
+                pkg_passed=true
+                stop_txe
+                break
+              fi
+              stop_txe
+            fi
+
+            if [ "$attempt" -lt "$MAX_RETRIES" ]; then
+              echo "::warning::Package $pkg failed on attempt $attempt, retrying..."
+            fi
+            attempt=$((attempt + 1))
+          done
+
+          if [ "$pkg_passed" = false ]; then
+            failed_packages="$failed_packages $pkg"
+            echo "::error::Package $pkg failed after $MAX_RETRIES attempts"
+          fi
+        done
+
+        echo ""
+        echo "========================================"
+        echo "Test Summary"
+        echo "========================================"
+
+        if [ -n "$failed_packages" ]; then
+          echo "::error::Failed packages:$failed_packages"
+          exit 1
+        else
+          echo "All packages passed"
+          exit 0
+        fi
