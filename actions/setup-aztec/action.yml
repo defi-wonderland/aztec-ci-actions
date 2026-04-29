@@ -14,6 +14,10 @@ inputs:
     description: 'Whether to run aztec codegen (requires run-compile)'
     required: false
     default: 'false'
+  foundry-version:
+    description: 'Pin Foundry to this version (e.g. v1.4.1). Empty = latest stable.'
+    required: false
+    default: ''
 
 outputs:
   aztec-version:
@@ -54,6 +58,8 @@ runs:
 
     - name: Install Foundry
       uses: foundry-rs/foundry-toolchain@v1
+      with:
+        version: ${{ inputs.foundry-version }}
 
     - name: Cache Aztec CLI
       id: cache-aztec
