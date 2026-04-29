@@ -69,7 +69,7 @@ steps:
       start-pxe: "false"
       run-compile: "true"
       run-codegen: "false"
-      foundry-version: "" # e.g. "v1.4.1" to pin; empty = latest stable
+      foundry-version: "v1.4.1" # default; set "" for latest stable, or override with another version
 ```
 
 ## What each action does
@@ -81,7 +81,7 @@ Full Aztec development environment setup:
 1. Node.js 22.17.0 (with yarn cache)
 2. Add `~/.aztec` to PATH
 3. Detect version from `config.aztecVersion` in `package.json`
-4. Install Foundry — latest stable by default; pass `foundry-version` (e.g. `v1.4.1`) to pin. Aztec 4.2.0's L1 deploy script is incompatible with forge ≥ 1.5, so consumers on that version should pin to `v1.4.1`.
+4. Install Foundry — pinned to `v1.4.1` by default (forge ≥ 1.5 added a `--batch` requirement that breaks Aztec 4.2.0's L1 deploy script). Override via `foundry-version` once Aztec ships a compatible deploy script; pass `""` for latest stable.
 5. Aztec CLI — restored from cache when available (key: `aztec-<runner.os>-<version>`), otherwise installed
 6. (optional) Start local network
 7. `yarn --frozen-lockfile`
