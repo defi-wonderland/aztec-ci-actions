@@ -18,6 +18,10 @@ inputs:
     description: 'Pin Foundry to this version. Defaults to v1.4.1 (last forge compatible with Aztec 4.2.0''s L1 deploy script — forge >= 1.5 added a --batch requirement that breaks sandbox start). Set to empty for latest stable.'
     required: false
     default: 'v1.4.1'
+  working-directory:
+    description: 'Directory where `aztec compile` and `aztec codegen` run. Use for monorepos where the Aztec contract lives under a subpath. yarn install and version detection still run at the repo root (so monorepos work with workspaces and root-mirrored aztecVersion).'
+    required: false
+    default: '.'
 
 outputs:
   aztec-version:
@@ -94,11 +98,13 @@ runs:
     - name: Compile contracts
       if: inputs.run-compile == 'true'
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
       run: aztec compile
 
     - name: Codegen wrappers
       if: inputs.run-codegen == 'true'
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
       run: aztec codegen target --outdir src/artifacts -f
 
     - name: Wait for local network (port 8080)

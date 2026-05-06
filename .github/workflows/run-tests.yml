@@ -19,6 +19,10 @@ on:
         description: "Job timeout in minutes"
         type: number
         default: 120
+      working-directory:
+        description: "Directory where `aztec compile`, `aztec codegen`, `yarn test:js`, and `aztec test` run. Use for monorepos where the contract lives under a subpath. Defaults to the repo root."
+        type: string
+        default: "."
 
 jobs:
   # ══════════════════════════════════════════════════════════════════════════════
@@ -40,9 +44,12 @@ jobs:
         with:
           start-pxe: "true"
           run-codegen: "true"
+          working-directory: ${{ inputs.working-directory }}
 
       - name: Run JS tests
         uses: defi-wonderland/aztec-ci-actions/actions/js-tests@v0
+        with:
+          working-directory: ${{ inputs.working-directory }}
 
   # ══════════════════════════════════════════════════════════════════════════════
   # NOIR TESTS JOB
@@ -63,6 +70,9 @@ jobs:
         with:
           start-pxe: "false"
           run-codegen: "false"
+          working-directory: ${{ inputs.working-directory }}
 
       - name: Run Noir tests
         uses: defi-wonderland/aztec-ci-actions/actions/noir-tests@v0
+        with:
+          working-directory: ${{ inputs.working-directory }}

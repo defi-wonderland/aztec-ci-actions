@@ -72,6 +72,21 @@ steps:
       foundry-version: "v1.4.1" # default; set "" for latest stable, or override with another version
 ```
 
+### Monorepo layout (contract under a subpath)
+
+If the Aztec contract lives in a sub-package (`contracts/foo/`, `packages/bar/`, etc.), pass `working-directory`:
+
+```yaml
+jobs:
+  tests:
+    uses: defi-wonderland/aztec-ci-actions/.github/workflows/run-tests.yml@<tag>
+    with:
+      working-directory: contracts/foo
+    secrets: inherit
+```
+
+`aztec compile`, `aztec codegen`, `yarn test:js`, and `aztec test` will all run from `contracts/foo/`. `yarn install` and Aztec version detection still run at the repo root, so yarn workspaces and a root-mirrored `config.aztecVersion` keep working.
+
 ## What each action does
 
 ### `setup-aztec`
