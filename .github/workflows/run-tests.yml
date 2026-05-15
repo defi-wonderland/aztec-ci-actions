@@ -40,14 +40,14 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Aztec environment
-        uses: defi-wonderland/aztec-ci-actions/actions/setup-aztec@v0
+        uses: defi-wonderland/aztec-ci-actions/actions/setup-aztec@fix/v4.3.0-rc.1
         with:
           start-pxe: "true"
           run-codegen: "true"
           working-directory: ${{ inputs.working-directory }}
 
       - name: Run JS tests
-        uses: defi-wonderland/aztec-ci-actions/actions/js-tests@v0
+        uses: defi-wonderland/aztec-ci-actions/actions/js-tests@fix/v4.3.0-rc.1
         with:
           working-directory: ${{ inputs.working-directory }}
 
@@ -66,13 +66,13 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Aztec environment
-        uses: defi-wonderland/aztec-ci-actions/actions/setup-aztec@v0
+        uses: defi-wonderland/aztec-ci-actions/actions/setup-aztec@fix/v4.3.0-rc.1
         with:
           start-pxe: "false"
           run-codegen: "false"
           working-directory: ${{ inputs.working-directory }}
 
       - name: Run Noir tests
-        uses: defi-wonderland/aztec-ci-actions/actions/noir-tests@v0
+        uses: defi-wonderland/aztec-ci-actions/actions/noir-tests@fix/v4.3.0-rc.1
         with:
           working-directory: ${{ inputs.working-directory }}
