@@ -8,7 +8,7 @@ Reusable GitHub Actions and workflows for Wonderland's Aztec submodule repos.
 actions/
 ├── setup-aztec/action.yml       # Node, Foundry, Aztec CLI, compile, codegen, PXE
 ├── js-tests/action.yml          # yarn test:js wrapper
-└── noir-tests/action.yml        # aztec test wrapper
+└── noir-tests/action.yml        # yarn test:nr wrapper
 
 .github/workflows/
 ├── run-tests.yml                # Reusable: js-tests + noir-tests
@@ -85,7 +85,7 @@ jobs:
     secrets: inherit
 ```
 
-`aztec compile`, `aztec codegen`, `yarn test:js`, and `aztec test` will all run from `contracts/foo/`. `yarn install` and Aztec version detection still run at the repo root, so yarn workspaces and a root-mirrored `config.aztecVersion` keep working.
+`aztec compile`, `aztec codegen`, `yarn test:js`, and `yarn test:nr` will all run from `contracts/foo/`. `yarn install` and Aztec version detection still run at the repo root, so yarn workspaces and a root-mirrored `config.aztecVersion` keep working.
 
 ## What each action does
 
@@ -108,7 +108,7 @@ For **pure-JS repos** (no Noir contracts): set `run-compile: "false"` and `run-c
 
 ### `js-tests` / `noir-tests`
 
-Thin wrappers around `yarn test:js` and `aztec test` with proper env vars and terminal allocation.
+Thin wrappers around `yarn test:js` and `yarn test:nr` with proper env vars and terminal allocation. Consumer repos define those scripts in `package.json` (the conventional shapes are `vitest run` for JS and `aztec test` for Noir), so any pre-/post-steps the repo needs — copying artifacts, exporting env, etc. — can be expressed in the script itself.
 
 ## Pre-release workflow
 

@@ -3,7 +3,7 @@ description: 'Run Noir contract tests'
 
 inputs:
   working-directory:
-    description: 'Directory to run `aztec test` from. Use for monorepos where the contract package is under a subpath.'
+    description: 'Directory to run `yarn test:nr` from. Use for monorepos where the contract package is under a subpath.'
     required: false
     default: '.'
 
@@ -14,4 +14,4 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       run: |
-        script -e -c "aztec test"
+        script -e -c "yarn test:nr"

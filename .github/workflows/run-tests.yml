@@ -20,7 +20,7 @@ on:
         type: number
         default: 120
       working-directory:
-        description: "Directory where `aztec compile`, `aztec codegen`, `yarn test:js`, and `aztec test` run. Use for monorepos where the contract lives under a subpath. Defaults to the repo root."
+        description: "Directory where `aztec compile`, `aztec codegen`, `yarn test:js`, and `yarn test:nr` run. Use for monorepos where the contract lives under a subpath. Defaults to the repo root."
         type: string
         default: "."
 
