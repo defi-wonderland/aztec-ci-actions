@@ -73,6 +73,6 @@ jobs:
           working-directory: ${{ inputs.working-directory }}
 
       - name: Run Noir tests
-        uses: defi-wonderland/aztec-ci-actions/actions/noir-tests@fix/testnr
+        uses: defi-wonderland/aztec-ci-actions/actions/noir-tests@v0
         with:
           working-directory: ${{ inputs.working-directory }}
